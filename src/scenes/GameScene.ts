@@ -1,5 +1,5 @@
 import 'phaser';
-import { Tank } from '../containers/Tank';
+import { Tank } from '../objects/Tank';
 
 export class GameScene extends Phaser.Scene {
     delta: number;
@@ -21,6 +21,7 @@ export class GameScene extends Phaser.Scene {
     preload(): void {
         this.load.image('tank', 'assets/Tank.png');
         this.load.image('turret', 'assets/GunTurret.png');
+        this.load.image('bullet', 'assets/Bullet.png');
         this.cursors = this.input.keyboard.createCursorKeys();
     }
 
@@ -29,6 +30,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     update(time): void {
-        this.tank.tankMoves(this.cursors);
+        this.tank.update(this.cursors);
     }
 }

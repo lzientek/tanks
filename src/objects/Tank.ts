@@ -1,10 +1,12 @@
 import 'phaser';
 import { Scene } from 'phaser';
+import { Bullet } from '../objects/Bullet';
 
 export class Tank extends Phaser.GameObjects.Container {
     tankBody: Phaser.GameObjects.Sprite;
     turret: Phaser.GameObjects.Sprite;
     body: Phaser.Physics.Arcade.Body;
+    bullets: Phaser.GameObjects.Group;
 
     constructor(scene: Scene, x, y) {
         const tankBody = scene.add.sprite(0, 0, 'tank');
@@ -22,9 +24,25 @@ export class Tank extends Phaser.GameObjects.Container {
         scene.add.existing(this);
         scene.physics.world.enable(this);
         this.body.setCollideWorldBounds(true);
+        this.bullets = scene.add.group({
+            classType: Bullet,
+            runChildUpdate: true,
+        });
+
+        this.scene.input.on(
+            'pointerdown',
+            () => {
+                const bullet = this.bullets.get() as Bullet;
+
+                if (bullet) {
+                    bullet.fire(this.x, this.y, this.turret.angle + this.angle);
+                }
+            },
+            this,
+        );
     }
 
-    tankMoves(cursors: Phaser.Types.Input.Keyboard.CursorKeys): void {
+    update(cursors: Phaser.Types.Input.Keyboard.CursorKeys): void {
         this.bodyMoves(cursors);
         this.turretMoves();
     }
@@ -46,11 +64,14 @@ export class Tank extends Phaser.GameObjects.Container {
 
     private turretMoves(): void {
         const mousePosition = this.scene.input.mousePointer.position;
-        console.log(this.angle, Phaser.Math.DegToRad(this.angle));
         this.turret.setRotation(
             Phaser.Math.Angle.Between(mousePosition.x, mousePosition.y, this.x, this.y) -
                 Phaser.Math.DegToRad(this.angle) -
                 Math.PI / 2,
         );
+    }
+
+    getScene(): Scene {
+        return this.scene;
     }
 }
