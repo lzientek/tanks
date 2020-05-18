@@ -13,6 +13,11 @@ export class Tank extends Phaser.GameObjects.Container {
     maxBullets: number;
     reloadTime: number;
 
+    static preload(scene: Phaser.Scene): void {
+        scene.load.image('tank', 'assets/Tank.png');
+        scene.load.image('turret', 'assets/GunTurret.png');
+    }
+
     constructor(scene: Scene, x, y, maxBullet = 3, reloadTime = 1000) {
         const tankBody = scene.add.sprite(0, 0, 'tank');
         tankBody.setScale(0.5, 0.5);
@@ -89,7 +94,6 @@ export class Tank extends Phaser.GameObjects.Container {
     }
 
     private reload(time: number): void {
-        console.log(time, this.lastFiredBullet);
         if (
             time - this.lastFiredBullet > this.reloadTime &&
             time - this.lastReload > this.reloadTime &&
