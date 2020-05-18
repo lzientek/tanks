@@ -1,26 +1,45 @@
-export class Bullet extends Phaser.Physics.Arcade.Sprite {
-    speed: number;
+import WorldBounds from '../interface/WorldBounds';
+
+export class Bullet extends Phaser.Physics.Arcade.Sprite implements WorldBounds {
     velocity: Phaser.Math.Vector2;
+    body: Phaser.Physics.Arcade.Body;
+    countCollision: number;
 
     static preload(scene: Phaser.Scene): void {
         scene.load.image('bullet', 'assets/Bullet.png');
     }
 
     constructor(scene) {
-        super(scene, 0, 0, 'bullet');
+        super(scene, -50, -50, 'bullet');
         this.setScale(0.5);
         this.setActive(false);
         this.setVisible(false);
+    }
+
+    onWorldBounds(): void {
+        this.countCollision--;
+
+        if (this.countCollision < 0) {
+            this.body.onWorldBounds = false;
+            this.scene.physics.world.disable(this);
+
+            this.setVelocity(0);
+            this.setActive(false);
+            this.setVisible(false);
+        }
     }
 
     fire(x: number, y: number, angle: number): void {
         this.setPosition(x, y);
         this.setAngle(angle);
         this.scene.physics.world.enable(this);
+        this.setCollideWorldBounds(true);
+
         this.setActive(true);
         this.setVisible(true);
-        this.setCollideWorldBounds(true);
+        this.countCollision = 1;
         this.setBounce(1);
+        this.body.onWorldBounds = true;
         this.body.velocity.copy(this.scene.physics.velocityFromAngle(angle - 90, 300));
     }
 

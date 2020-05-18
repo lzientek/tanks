@@ -27,6 +27,7 @@ export class GameScene extends Phaser.Scene {
 
     create(): void {
         this.tank = new Tank(this, this.cameras.main.centerX, this.cameras.main.centerY);
+        this.physics.world.on('worldbounds', (body, ...params) => body.gameObject.onWorldBounds(body, ...params));
     }
 
     update(time): void {
