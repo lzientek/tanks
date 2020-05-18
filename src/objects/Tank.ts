@@ -41,7 +41,6 @@ export class Tank extends Phaser.GameObjects.Container {
         this.body.setCollideWorldBounds(true);
         this.bullets = scene.add.group({
             classType: Bullet,
-            runChildUpdate: true,
         });
 
         this.scene.input.on(
@@ -80,7 +79,7 @@ export class Tank extends Phaser.GameObjects.Container {
         if (cursors.up.isDown) {
             this.body.velocity.copy(this.scene.physics.velocityFromAngle(this.angle - 90, 100)); //+90 to start at the front of the sprite
         } else if (cursors.down.isDown) {
-            this.body.velocity.copy(this.scene.physics.velocityFromAngle(this.angle + 90, 100));
+            this.body.velocity.copy(this.scene.physics.velocityFromAngle(this.angle + 90, 80));
         }
     }
 

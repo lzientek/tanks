@@ -42,6 +42,4 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite implements WorldBounds 
         this.body.onWorldBounds = true;
         this.body.velocity.copy(this.scene.physics.velocityFromAngle(angle - 90, 300));
     }
-
-    update(): void {}
 }
