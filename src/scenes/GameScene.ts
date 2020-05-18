@@ -30,6 +30,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     update(time): void {
-        this.tank.update(this.cursors);
+        this.tank.update(time, this.cursors);
     }
 }

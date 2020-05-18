@@ -7,8 +7,13 @@ export class Tank extends Phaser.GameObjects.Container {
     turret: Phaser.GameObjects.Sprite;
     body: Phaser.Physics.Arcade.Body;
     bullets: Phaser.GameObjects.Group;
+    lastFiredBullet: number;
+    lastReload: number;
+    availableBullets: number;
+    maxBullets: number;
+    reloadTime: number;
 
-    constructor(scene: Scene, x, y) {
+    constructor(scene: Scene, x, y, maxBullet = 3, reloadTime = 1000) {
         const tankBody = scene.add.sprite(0, 0, 'tank');
         tankBody.setScale(0.5, 0.5);
         const turret = scene.add.sprite(0, 0, 'turret');
@@ -16,6 +21,11 @@ export class Tank extends Phaser.GameObjects.Container {
         turret.setOrigin(0.5, 0.75);
 
         super(scene, x, y, [tankBody, turret]);
+
+        this.availableBullets = maxBullet;
+        this.maxBullets = maxBullet;
+        this.reloadTime = reloadTime;
+        this.lastReload = this.scene.time.now;
 
         this.tankBody = tankBody;
         this.turret = turret;
@@ -34,17 +44,24 @@ export class Tank extends Phaser.GameObjects.Container {
             () => {
                 const bullet = this.bullets.get() as Bullet;
 
-                if (bullet) {
+                if (bullet && this.availableBullets > 0) {
                     bullet.fire(this.x, this.y, this.turret.angle + this.angle);
+                    this.availableBullets--;
+                    this.lastFiredBullet = this.scene.time.now;
                 }
             },
             this,
         );
     }
 
-    update(cursors: Phaser.Types.Input.Keyboard.CursorKeys): void {
+    update(time: number, cursors: Phaser.Types.Input.Keyboard.CursorKeys): void {
         this.bodyMoves(cursors);
         this.turretMoves();
+        this.reload(time);
+    }
+
+    getScene(): Scene {
+        return this.scene;
     }
 
     private bodyMoves(cursors: Phaser.Types.Input.Keyboard.CursorKeys): void {
@@ -71,7 +88,15 @@ export class Tank extends Phaser.GameObjects.Container {
         );
     }
 
-    getScene(): Scene {
-        return this.scene;
+    private reload(time: number): void {
+        console.log(time, this.lastFiredBullet);
+        if (
+            time - this.lastFiredBullet > this.reloadTime &&
+            time - this.lastReload > this.reloadTime &&
+            this.availableBullets < this.maxBullets
+        ) {
+            this.availableBullets++;
+            this.lastReload = time;
+        }
     }
 }
