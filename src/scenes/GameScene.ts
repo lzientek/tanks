@@ -30,7 +30,7 @@ export class GameScene extends Phaser.Scene {
         this.obstacles = new Obstacles(this);
 
         this.physics.add.collider(this.tank, this.obstacles);
-        this.physics.add.collider(this.tank.bullets, this.obstacles);
+        this.physics.add.collider(this.tank.bullets, this.obstacles, (bullet: Bullet) => bullet.onWorldBounds());
     }
 
     update(time: number): void {
