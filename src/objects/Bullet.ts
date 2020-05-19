@@ -52,4 +52,10 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite implements Collide {
         this.body.onWorldBounds = true;
         this.body.velocity.copy(this.scene.physics.velocityFromAngle(angle - 90, 300));
     }
+
+    update(): void {
+        if (this.body) {
+            this.setAngle(Phaser.Math.RadToDeg(this.body.angle) + 90);
+        }
+    }
 }

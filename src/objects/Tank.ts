@@ -47,6 +47,7 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
         this.body.setCollideWorldBounds(true);
         this.bullets = scene.add.group({
             classType: Bullet,
+            runChildUpdate: true,
         });
 
         this.scene.input.on(
