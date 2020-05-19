@@ -1,26 +1,31 @@
 import 'phaser';
 import { Scene } from 'phaser';
 import { Bullet } from '../objects/Bullet';
+import { GameScene } from '../scenes/GameScene';
+import Collide from '../interface/Collide';
 
-export class Tank extends Phaser.GameObjects.Container {
+export class Tank extends Phaser.GameObjects.Container implements Collide {
     tankBody: Phaser.GameObjects.Sprite;
     turret: Phaser.GameObjects.Sprite;
     body: Phaser.Physics.Arcade.Body;
     bullets: Phaser.GameObjects.Group;
+    life: number;
     lastFiredBullet: number;
     lastReload: number;
     availableBullets: number;
     maxBullets: number;
     reloadTime: number;
+    scene: GameScene;
 
     static preload(scene: Phaser.Scene): void {
         scene.load.image('tank', 'assets/Tank.png');
         scene.load.image('turret', 'assets/GunTurret.png');
     }
 
-    constructor(scene: Scene, x, y, maxBullet = 3, reloadTime = 1000) {
+    constructor(scene: GameScene, x, y, maxBullet = 3, reloadTime = 1000, life = 3) {
         const tankBody = scene.add.sprite(0, 0, 'tank');
         tankBody.setScale(0.5, 0.5);
+
         const turret = scene.add.sprite(0, 0, 'turret');
         turret.setScale(0.5, 0.5);
         turret.setOrigin(0.5, 0.75);
@@ -34,6 +39,7 @@ export class Tank extends Phaser.GameObjects.Container {
 
         this.tankBody = tankBody;
         this.turret = turret;
+        this.life = life;
 
         this.setSize(this.tankBody.width / 2, this.tankBody.height / 2);
         scene.add.existing(this);
@@ -62,6 +68,16 @@ export class Tank extends Phaser.GameObjects.Container {
         this.bodyMoves(cursors);
         this.turretMoves();
         this.reload(time);
+    }
+
+    onCollide(bullet: Bullet): void {
+        console.log('colision', this);
+        this.life--;
+
+        if (this.life <= 0) {
+            console.log('Explode');
+        }
+        bullet.onCollide();
     }
 
     getScene(): Scene {

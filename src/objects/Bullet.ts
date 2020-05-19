@@ -1,6 +1,6 @@
-import WorldBounds from '../interface/WorldBounds';
+import Collide from '../interface/Collide';
 
-export class Bullet extends Phaser.Physics.Arcade.Sprite implements WorldBounds {
+export class Bullet extends Phaser.Physics.Arcade.Sprite implements Collide {
     velocity: Phaser.Math.Vector2;
     body: Phaser.Physics.Arcade.Body;
     countCollision: number;
@@ -16,7 +16,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite implements WorldBounds 
         this.setVisible(false);
     }
 
-    onWorldBounds(): void {
+    onCollide(): void {
         this.countCollision--;
 
         if (this.countCollision < 0) {
