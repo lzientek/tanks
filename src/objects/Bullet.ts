@@ -3,7 +3,7 @@ import Collide from '../interface/Collide';
 export class Bullet extends Phaser.Physics.Arcade.Sprite implements Collide {
     velocity: Phaser.Math.Vector2;
     body: Phaser.Physics.Arcade.Body;
-    countCollision: number;
+    availableCollision: number;
 
     static preload(scene: Phaser.Scene): void {
         scene.load.image('bullet', 'assets/Bullet.png');
@@ -11,15 +11,15 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite implements Collide {
 
     constructor(scene) {
         super(scene, -50, -50, 'bullet');
-        this.setScale(0.5);
+        this.setScale(1);
         this.setActive(false);
         this.setVisible(false);
     }
 
     onCollide(): void {
-        this.countCollision--;
+        this.availableCollision--;
 
-        if (this.countCollision < 0) {
+        if (this.availableCollision < 0) {
             this.body.onWorldBounds = false;
             this.scene.physics.world.disable(this);
 
@@ -27,6 +27,16 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite implements Collide {
             this.setActive(false);
             this.setVisible(false);
         }
+    }
+
+    bulletToBulletCollision(): void {
+        this.availableCollision = 0;
+        this.body.onWorldBounds = false;
+        this.scene.physics.world.disable(this);
+
+        this.setVelocity(0);
+        this.setActive(false);
+        this.setVisible(false);
     }
 
     fire(x: number, y: number, angle: number): void {
@@ -37,7 +47,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite implements Collide {
 
         this.setActive(true);
         this.setVisible(true);
-        this.countCollision = 1;
+        this.availableCollision = 1;
         this.setBounce(1);
         this.body.onWorldBounds = true;
         this.body.velocity.copy(this.scene.physics.velocityFromAngle(angle - 90, 300));

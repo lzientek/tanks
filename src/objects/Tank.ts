@@ -27,7 +27,7 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
         tankBody.setScale(0.5, 0.5);
 
         const turret = scene.add.sprite(0, 0, 'turret');
-        turret.setScale(0.5, 0.5);
+        turret.setScale(1, 0.5);
         turret.setOrigin(0.5, 0.75);
 
         super(scene, x, y, [tankBody, turret]);
@@ -71,8 +71,8 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
     }
 
     onCollide(bullet: Bullet): void {
-        console.log('colision', this);
         this.life--;
+        console.log('collide');
 
         if (this.life <= 0) {
             console.log('Explode');

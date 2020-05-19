@@ -36,6 +36,10 @@ export class GameScene extends Phaser.Scene {
         this.physics.add.collider(this.tank, this.obstacles);
         this.physics.add.collider(this.tank.bullets, this.tank, (b: Bullet) => this.tank.onCollide(b));
         this.physics.add.collider(this.tank.bullets, this.obstacles, (bullet: Bullet) => bullet.onCollide());
+        this.physics.add.collider(this.tank.bullets, this.tank.bullets, (b1: Bullet, b2: Bullet) => {
+            b1.bulletToBulletCollision();
+            b2.bulletToBulletCollision();
+        });
     }
 
     update(time: number): void {
