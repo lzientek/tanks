@@ -81,7 +81,7 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
         if (this.life <= 0) {
             console.log('Explode');
         }
-        bullet.onCollide();
+        bullet.onCollide(true);
     }
 
     getScene(): Scene {

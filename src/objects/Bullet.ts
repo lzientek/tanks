@@ -1,9 +1,8 @@
-import Collide from '../interface/Collide';
-
-export class Bullet extends Phaser.Physics.Arcade.Sprite implements Collide {
+export class Bullet extends Phaser.Physics.Arcade.Sprite {
     velocity: Phaser.Math.Vector2;
     body: Phaser.Physics.Arcade.Body;
     availableCollision: number;
+    initialTime: number;
 
     static preload(scene: Phaser.Scene): void {
         scene.load.image('bullet', 'assets/Bullet.png');
@@ -14,13 +13,17 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite implements Collide {
         this.setScale(1);
         this.setActive(false);
         this.setVisible(false);
-        this.setDepth(30);
+        this.setDepth(10);
     }
 
-    onCollide(): void {
+    onCollide(destroy = false): void {
+        if (this.scene.time.now - this.initialTime < 100) {
+            console.log('too early', this.initialTime, this.scene.time.now);
+            return;
+        }
         this.availableCollision--;
 
-        if (this.availableCollision < 0) {
+        if (this.availableCollision < 0 || destroy) {
             this.body.onWorldBounds = false;
             this.scene.physics.world.disable(this);
 
@@ -41,6 +44,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite implements Collide {
     }
 
     fire(x: number, y: number, angle: number): void {
+        this.initialTime = this.scene.time.now;
         this.setPosition(x, y);
         this.setAngle(angle);
         this.scene.physics.world.enable(this);

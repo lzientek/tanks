@@ -10,6 +10,7 @@ export class GameScene extends Phaser.Scene {
     lastStarTime: number;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     tank: Tank;
+    ennemies: Phaser.GameObjects.Group;
     obstacles: Obstacles;
 
     constructor() {
@@ -32,8 +33,12 @@ export class GameScene extends Phaser.Scene {
         );
 
         this.obstacles = new Obstacles(this);
+        this.ennemies = this.add.group([new Tank(this, 50, 50, 0, 1000, 5), new Tank(this, 450, 200, 0, 1000, 5)]);
 
         this.physics.add.collider(this.tank, this.obstacles);
+        this.physics.add.collider(this.ennemies, this.obstacles);
+        this.physics.add.collider(this.tank, this.ennemies);
+        this.physics.add.collider(this.tank.bullets, this.ennemies, (b: Bullet, ennemy: Tank) => ennemy.onCollide(b));
         this.physics.add.collider(this.tank.bullets, this.tank, (b: Bullet) => this.tank.onCollide(b));
         this.physics.add.collider(this.tank.bullets, this.obstacles, (bullet: Bullet) => bullet.onCollide());
         this.physics.add.collider(this.tank.bullets, this.tank.bullets, (b1: Bullet, b2: Bullet) => {
