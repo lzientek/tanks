@@ -14,6 +14,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite implements Collide {
         this.setScale(1);
         this.setActive(false);
         this.setVisible(false);
+        this.setDepth(30);
     }
 
     onCollide(): void {

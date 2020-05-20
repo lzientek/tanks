@@ -25,13 +25,16 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
     constructor(scene: GameScene, x, y, maxBullet = 3, reloadTime = 1000, life = 3) {
         const tankBody = scene.add.sprite(0, 0, 'tank');
         tankBody.setScale(0.5, 0.5);
+        tankBody.setDepth(40);
 
         const turret = scene.add.sprite(0, 0, 'turret');
         turret.setScale(1, 0.5);
         turret.setOrigin(0.5, 0.75);
+        turret.setDepth(50);
 
         super(scene, x, y, [tankBody, turret]);
 
+        this.setDepth(20);
         this.availableBullets = maxBullet;
         this.maxBullets = maxBullet;
         this.reloadTime = reloadTime;
