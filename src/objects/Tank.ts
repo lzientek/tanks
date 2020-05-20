@@ -44,7 +44,7 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
         this.turret = turret;
         this.life = life;
 
-        this.setSize(this.tankBody.width / 2, this.tankBody.height / 2);
+        this.setSize(this.tankBody.displayHeight * 0.8, this.tankBody.displayHeight * 0.8);
         scene.add.existing(this);
         scene.physics.world.enable(this);
         this.body.setCollideWorldBounds(true);
