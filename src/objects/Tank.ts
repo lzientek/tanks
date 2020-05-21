@@ -9,6 +9,7 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
     turret: Phaser.GameObjects.Sprite;
     body: Phaser.Physics.Arcade.Body;
     bullets: Phaser.GameObjects.Group;
+    cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     life: number;
     lastFiredBullet: number;
     lastReload: number;
@@ -23,7 +24,7 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
         scene.load.image('turret', 'assets/GunTurret.png');
     }
 
-    constructor(scene: GameScene, x, y, maxBullet = 3, reloadTime = 1000, life = 3) {
+    constructor(scene: GameScene, x, y, isRemote = false, maxBullet = 3, reloadTime = 1000, life = 3) {
         const tankBody = scene.add.sprite(0, 0, 'tank');
         tankBody.setScale(0.5, 0.5);
         tankBody.setDepth(40);
@@ -49,42 +50,27 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
         scene.add.existing(this);
         scene.physics.world.enable(this);
         this.body.setCollideWorldBounds(true);
-        this.body.setImmovable(true);
         this.bullets = scene.add.group({
             classType: Bullet,
             runChildUpdate: true,
         });
 
-        this.scene.input.on(
-            'pointerdown',
-            () => {
-                if (this.deathTime) {
-                    return;
-                }
-
-                const bullet = this.bullets.get() as Bullet;
-
-                if (bullet && this.availableBullets > 0) {
-                    bullet.fire(this.x, this.y, this.turret.angle + this.angle);
-                    this.availableBullets--;
-                    this.lastFiredBullet = this.scene.time.now;
-                }
-            },
-            this,
-        );
+        this.localControls(isRemote);
     }
 
-    update(time: number, cursors: Phaser.Types.Input.Keyboard.CursorKeys): void {
-        if (time - this.deathTime > 2500) {
+    update(time: number): void {
+        if (time - this.deathTime > 2000) {
             this.setActive(false);
             this.setVisible(false);
-            this.scene.physics.world.disable(this);
-        } else if (this.deathTime && time % 400 < 300) {
-            this.setVisible(false);
-        } else if (this.deathTime && time % 400 >= 300) {
-            this.setVisible(true);
-        } else {
-            this.bodyMoves(cursors);
+        } else if (this.deathTime) {
+            if ((time - this.deathTime) % 400 < 300) {
+                this.setVisible(false);
+            } else {
+                this.setVisible(true);
+            }
+        } else if (this.cursors) {
+            // FIXME move from distance or bot
+            this.bodyMoves(this.cursors);
             this.turretMoves();
             this.reload(time);
         }
@@ -97,6 +83,7 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
         if (this.life <= 0) {
             console.log('Explode');
             this.deathTime = this.scene.time.now;
+            this.scene.physics.world.disable(this);
         }
         bullet.onCollide(true);
     }
@@ -137,6 +124,27 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
         ) {
             this.availableBullets++;
             this.lastReload = time;
+        }
+    }
+
+    private localControls(isRemote: boolean): void {
+        if (!isRemote) {
+            this.cursors = this.scene.input.keyboard.createCursorKeys();
+            this.scene.input.on(
+                'pointerdown',
+                () => {
+                    if (this.deathTime) {
+                        return;
+                    }
+                    const bullet = this.bullets.get() as Bullet;
+                    if (bullet && this.availableBullets > 0) {
+                        bullet.fire(this.x, this.y, this.turret.angle + this.angle);
+                        this.availableBullets--;
+                        this.lastFiredBullet = this.scene.time.now;
+                    }
+                },
+                this,
+            );
         }
     }
 }
