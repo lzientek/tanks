@@ -12,6 +12,7 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
     life: number;
     lastFiredBullet: number;
     lastReload: number;
+    deathTime: number;
     availableBullets: number;
     maxBullets: number;
     reloadTime: number;
@@ -48,6 +49,7 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
         scene.add.existing(this);
         scene.physics.world.enable(this);
         this.body.setCollideWorldBounds(true);
+        this.body.setImmovable(true);
         this.bullets = scene.add.group({
             classType: Bullet,
             runChildUpdate: true,
@@ -56,6 +58,10 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
         this.scene.input.on(
             'pointerdown',
             () => {
+                if (this.deathTime) {
+                    return;
+                }
+
                 const bullet = this.bullets.get() as Bullet;
 
                 if (bullet && this.availableBullets > 0) {
@@ -69,9 +75,19 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
     }
 
     update(time: number, cursors: Phaser.Types.Input.Keyboard.CursorKeys): void {
-        this.bodyMoves(cursors);
-        this.turretMoves();
-        this.reload(time);
+        if (time - this.deathTime > 2500) {
+            this.setActive(false);
+            this.setVisible(false);
+            this.scene.physics.world.disable(this);
+        } else if (this.deathTime && time % 400 < 300) {
+            this.setVisible(false);
+        } else if (this.deathTime && time % 400 >= 300) {
+            this.setVisible(true);
+        } else {
+            this.bodyMoves(cursors);
+            this.turretMoves();
+            this.reload(time);
+        }
     }
 
     onCollide(bullet: Bullet): void {
@@ -80,6 +96,7 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
 
         if (this.life <= 0) {
             console.log('Explode');
+            this.deathTime = this.scene.time.now;
         }
         bullet.onCollide(true);
     }
