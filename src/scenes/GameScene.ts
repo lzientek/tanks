@@ -46,6 +46,7 @@ export class GameScene extends Phaser.Scene {
             b1.bulletToBulletCollision();
             b2.bulletToBulletCollision();
         });
+        //fixme bullet to bullet with enemmis bullets ^^
     }
 
     update(time: number): void {
