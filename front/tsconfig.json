@@ -1,6 +1,8 @@
 {
+  
     "compilerOptions": {
-      "target": "es5"
+      "target": "es5",
+      "esModuleInterop": true
     },
     "include": [
       "src/*", "src/scenes/playScene.ts"

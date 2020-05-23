@@ -1,15 +1,11 @@
 {
+  "include": ["**/*"],
+  "exclude": [".eslintrc.js"],
   "compilerOptions": {
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "target": "es2017",
-    "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": "./",
-    "incremental": true
-  },
-  "exclude": ["node_modules", "dist"]
+    "target": "es5",                         
+    "strict": true,                          
+    "esModuleInterop": true,                 
+    "skipLibCheck": true,                    
+    "forceConsistentCasingInFileNames": true 
+  }
 }

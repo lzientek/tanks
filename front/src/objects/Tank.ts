@@ -3,6 +3,7 @@ import { Scene } from 'phaser';
 import { Bullet } from '../objects/Bullet';
 import { GameScene } from '../scenes/GameScene';
 import Collide from '../interface/Collide';
+import Client from '../socket/Client';
 
 export class Tank extends Phaser.GameObjects.Container implements Collide {
     tankBody: Phaser.GameObjects.Sprite;
@@ -18,6 +19,7 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
     maxBullets: number;
     reloadTime: number;
     scene: GameScene;
+    client: Client;
 
     static preload(scene: Phaser.Scene): void {
         scene.load.image('tank', 'assets/Tank.png');
@@ -95,16 +97,20 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
     private bodyMoves(cursors: Phaser.Types.Input.Keyboard.CursorKeys): void {
         this.body.setAngularVelocity(0);
         this.body.setVelocity(0);
+
         if (cursors.left.isDown) {
             this.body.setAngularVelocity(-200);
         } else if (cursors.right.isDown) {
             this.body.setAngularVelocity(200);
         }
+
         if (cursors.up.isDown) {
             this.body.velocity.copy(this.scene.physics.velocityFromAngle(this.angle - 90, 100)); //+90 to start at the front of the sprite
         } else if (cursors.down.isDown) {
             this.body.velocity.copy(this.scene.physics.velocityFromAngle(this.angle + 90, 80));
         }
+
+        this.client.move(this.x, this.y);
     }
 
     private turretMoves(): void {
