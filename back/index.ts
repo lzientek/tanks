@@ -10,8 +10,8 @@ const io = socket.listen(server);
 
 interface Player {
     id: string;
-    x: number;
-    y: number;
+    x?: number;
+    y?: number;
 }
 
 server.listen(process.env.PORT || 3001, function () {
@@ -19,9 +19,14 @@ server.listen(process.env.PORT || 3001, function () {
 });
 
 io.on('connection', (socket: SocketIO.Socket & { player: Player }) => {
-    console.log(socket);
-    socket.player = { id: uuid(), x: 34, y: 34 };
-
+    socket.player = { id: uuid() };
+    socket.on('getallplayers', () => {
+        socket.emit(
+            'newplayers',
+            Object.entries(io.sockets.connected).map(([, s]: [string, any]) => s.player.id !== socket.player.id ? s.player :null).filter(p=>p),
+        );
+    });
+  
     socket.on('move', (position) => {
         socket.player = { ...socket.player, ...position };
         socket.broadcast.emit('move', socket.player);

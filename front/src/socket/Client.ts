@@ -11,12 +11,25 @@ export default class Client {
         this.socket = io.connect('http://localhost:3001');
     }
 
+    getAllPlayer(): void {
+        this.socket.emit('getallplayers');
+    }
+
     setNewPlayer(f: (move: Player) => void): void {
         this.socket.on('newplayer', (args: Move) => {
-            const p = new Player(args.id, this.socket);
+            const p = new Player(args.id, args, this.socket);
             this.players.push(p);
 
             f(p);
+        });
+
+        this.socket.on('newplayers', (players: Move[]) => {
+            players.forEach((np) => {
+                const p = new Player(np.id, np, this.socket);
+                this.players.push(p);
+
+                f(p);
+            });
         });
     }
 

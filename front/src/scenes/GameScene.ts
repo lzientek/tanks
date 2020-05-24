@@ -6,7 +6,6 @@ import Client from '../socket/Client';
 import Player from '../socket/Player';
 
 export class GameScene extends Phaser.Scene {
-    clientWS: Client;
     delta: number;
     lastStarTime: number;
     tank: Tank;
@@ -26,15 +25,15 @@ export class GameScene extends Phaser.Scene {
     }
 
     create(): void {
-        this.clientWS = new Client();
-        this.clientWS.setNewPlayer((p: Player) => {
-            const t = new Tank(this, 50, 50);
+        const clientWS = new Client();
+        this.tank = new Tank(this, this.cameras.main.centerX, this.cameras.main.centerY, clientWS);
+
+        clientWS.setNewPlayer((p: Player) => {
+            const t = new Tank(this, p.initialPosition.x, p.initialPosition.y);
             t.setPlayer(p);
             this.ennemies.add(t);
         });
-
-        this.tank = new Tank(this, this.cameras.main.centerX, this.cameras.main.centerY);
-        this.tank.client = this.clientWS;
+        clientWS.getAllPlayer();
 
         this.physics.world.on('worldbounds', (body: Phaser.Physics.Arcade.Body & { gameObject: Bullet }) =>
             body.gameObject.onCollide(),

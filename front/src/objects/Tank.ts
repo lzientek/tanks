@@ -21,7 +21,7 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
     maxBullets: number;
     reloadTime: number;
     scene: GameScene;
-    client: Client;
+    client?: Client;
     player: Player;
 
     static preload(scene: Phaser.Scene): void {
@@ -29,7 +29,7 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
         scene.load.image('turret', 'assets/GunTurret.png');
     }
 
-    constructor(scene: GameScene, x, y, isRemote = false, maxBullet = 3, reloadTime = 1000, life = 3) {
+    constructor(scene: GameScene, x, y, client?: Client, maxBullet = 3, reloadTime = 1000, life = 3) {
         const tankBody = scene.add.sprite(0, 0, 'tank');
         tankBody.setScale(0.5, 0.5);
         tankBody.setDepth(40);
@@ -42,6 +42,7 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
         super(scene, x, y, [tankBody, turret]);
 
         this.setDepth(20);
+        this.client = client;
         this.availableBullets = maxBullet;
         this.maxBullets = maxBullet;
         this.reloadTime = reloadTime;
@@ -60,7 +61,8 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
             runChildUpdate: true,
         });
 
-        this.localControls(isRemote);
+        this.localControls(!!client);
+        this.client?.move({ x: this.x, y: this.y, angle: this.angle, turretAngle: this.turret.angle });
     }
 
     setPlayer(p: Player): void {
@@ -78,8 +80,7 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
             } else {
                 this.setVisible(true);
             }
-        } else if (!this.player) {
-            // FIXME move from distance or bot
+        } else if (this.client) {
             this.bodyMoves(this.cursors);
             this.turretMoves();
             this.reload(time);
@@ -87,8 +88,6 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
     }
 
     onMove(m: Move): void {
-        console.log('rgerg');
-        console.log(m, this);
         this.setX(m.x);
         this.setY(m.y);
         this.setAngle(m.angle);
@@ -152,8 +151,8 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
         }
     }
 
-    private localControls(isRemote: boolean): void {
-        if (!isRemote) {
+    private localControls(isLocal: boolean): void {
+        if (isLocal) {
             this.cursors = this.scene.input.keyboard.createCursorKeys();
             this.scene.input.on(
                 'pointerdown',

@@ -5,10 +5,12 @@ export default class Player {
     socket: SocketIOClient.Socket;
     onMove: (move: Move) => void;
     onBulletShot: Function;
+    initialPosition: Move;
 
-    constructor(id: string, socket: SocketIOClient.Socket) {
+    constructor(id: string, initialPosition: Move, socket: SocketIOClient.Socket) {
         this.id = id;
         this.socket = socket;
+        this.initialPosition = initialPosition;
 
         this.socket.on('move', ({ id, ...move }: Move) => {
             if (id === this.id && this.onMove) {
