@@ -1,4 +1,5 @@
 import express from 'express';
+import { v4 as uuid } from 'uuid';
 import { Server } from 'http';
 import socket from 'socket.io';
 import { AddressInfo } from 'net';
@@ -7,9 +8,8 @@ const app = express();
 const server = new Server(app);
 const io = socket.listen(server);
 
-let id = 1;
 interface Player {
-    id: number;
+    id: string;
     x: number;
     y: number;
 }
@@ -20,7 +20,7 @@ server.listen(process.env.PORT || 3001, function () {
 
 io.on('connection', (socket: SocketIO.Socket & { player: Player }) => {
     console.log(socket);
-    socket.player = { id: id++, x: 34, y: 34 };
+    socket.player = { id: uuid(), x: 34, y: 34 };
 
     socket.on('move', (position) => {
         socket.player = { ...socket.player, ...position };

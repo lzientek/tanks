@@ -3,6 +3,7 @@ import { Tank } from '../objects/Tank';
 import { Bullet } from '../objects/Bullet';
 import { Obstacles } from '../objects/Obstacles';
 import Client from '../socket/Client';
+import Player from '../socket/Player';
 
 export class GameScene extends Phaser.Scene {
     clientWS: Client;
@@ -26,17 +27,21 @@ export class GameScene extends Phaser.Scene {
 
     create(): void {
         this.clientWS = new Client();
+        this.clientWS.setNewPlayer((p: Player) => {
+            const t = new Tank(this, 50, 50);
+            t.setPlayer(p);
+            this.ennemies.add(t);
+        });
+
         this.tank = new Tank(this, this.cameras.main.centerX, this.cameras.main.centerY);
         this.tank.client = this.clientWS;
+
         this.physics.world.on('worldbounds', (body: Phaser.Physics.Arcade.Body & { gameObject: Bullet }) =>
             body.gameObject.onCollide(),
         );
 
         this.obstacles = new Obstacles(this);
-        this.ennemies = this.add.group([
-            new Tank(this, 50, 50, true, 0, 1000, 5),
-            new Tank(this, 450, 200, true, 0, 1000, 5),
-        ]);
+        this.ennemies = this.add.group([]);
         this.ennemies.runChildUpdate = true;
 
         this.physics.add.collider(this.tank, this.obstacles);

@@ -4,6 +4,8 @@ import { Bullet } from '../objects/Bullet';
 import { GameScene } from '../scenes/GameScene';
 import Collide from '../interface/Collide';
 import Client from '../socket/Client';
+import Player from '../socket/Player';
+import Move from '../interface/Move';
 
 export class Tank extends Phaser.GameObjects.Container implements Collide {
     tankBody: Phaser.GameObjects.Sprite;
@@ -20,6 +22,7 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
     reloadTime: number;
     scene: GameScene;
     client: Client;
+    player: Player;
 
     static preload(scene: Phaser.Scene): void {
         scene.load.image('tank', 'assets/Tank.png');
@@ -60,6 +63,11 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
         this.localControls(isRemote);
     }
 
+    setPlayer(p: Player): void {
+        this.player = p;
+        this.player.setFunctions(this.onMove.bind(this), null);
+    }
+
     update(time: number): void {
         if (time - this.deathTime > 2000) {
             this.setActive(false);
@@ -70,12 +78,21 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
             } else {
                 this.setVisible(true);
             }
-        } else if (this.cursors) {
+        } else if (!this.player) {
             // FIXME move from distance or bot
             this.bodyMoves(this.cursors);
             this.turretMoves();
             this.reload(time);
         }
+    }
+
+    onMove(m: Move): void {
+        console.log('rgerg');
+        console.log(m, this);
+        this.setX(m.x);
+        this.setY(m.y);
+        this.setAngle(m.angle);
+        this.turret.setAngle(m.turretAngle);
     }
 
     onCollide(bullet: Bullet): void {
@@ -110,7 +127,9 @@ export class Tank extends Phaser.GameObjects.Container implements Collide {
             this.body.velocity.copy(this.scene.physics.velocityFromAngle(this.angle + 90, 80));
         }
 
-        this.client.move(this.x, this.y);
+        if (this.client) {
+            this.client.move({ x: this.x, y: this.y, angle: this.angle, turretAngle: this.turret.angle });
+        }
     }
 
     private turretMoves(): void {
