@@ -3,7 +3,7 @@ import equal from 'deep-equal';
 import Player from './Player';
 import Move from '../interface/Move';
 
-export default class Client {
+export class Client {
     socket: SocketIOClient.Socket;
     players: Player[] = [];
 
@@ -41,3 +41,7 @@ export default class Client {
         }
     }
 }
+
+const client = new Client();
+
+export default client;

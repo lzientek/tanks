@@ -2,10 +2,10 @@ import 'phaser';
 import { Tank } from '../objects/Tank';
 import { Bullet } from '../objects/Bullet';
 import { Obstacles } from '../objects/Obstacles';
-import Client from '../socket/Client';
+import client from '../socket/Client';
 import Player from '../socket/Player';
 
-export class GameScene extends Phaser.Scene {
+export default class GameScene extends Phaser.Scene {
     delta: number;
     lastStarTime: number;
     tank: Tank;
@@ -25,15 +25,14 @@ export class GameScene extends Phaser.Scene {
     }
 
     create(): void {
-        const clientWS = new Client();
-        this.tank = new Tank(this, this.cameras.main.centerX, this.cameras.main.centerY, clientWS);
+        this.tank = new Tank(this, this.cameras.main.centerX, this.cameras.main.centerY, client);
 
-        clientWS.setNewPlayer((p: Player) => {
+        client.setNewPlayer((p: Player) => {
             const t = new Tank(this, p.initialPosition.x, p.initialPosition.y);
             t.setPlayer(p);
             this.ennemies.add(t);
         });
-        clientWS.getAllPlayer();
+        client.getAllPlayer();
 
         this.physics.world.on('worldbounds', (body: Phaser.Physics.Arcade.Body & { gameObject: Bullet }) =>
             body.gameObject.onCollide(),

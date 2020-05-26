@@ -1,5 +1,6 @@
 import 'phaser';
-import { GameScene } from './scenes/GameScene';
+import GameScene from './scenes/GameScene';
+import HomeScene from './scenes/HomeScene';
 
 const config: Phaser.Types.Core.GameConfig = {
     title: 'Tanks',
@@ -7,7 +8,10 @@ const config: Phaser.Types.Core.GameConfig = {
     height: 600,
     parent: 'game',
     backgroundColor: '#f5b642',
-    scene: [GameScene],
+    scene: [HomeScene, GameScene],
+    dom: {
+        createContainer: true,
+    },
     physics: {
         default: 'arcade',
         arcade: {

@@ -1,9 +1,9 @@
 import 'phaser';
 import { Scene } from 'phaser';
 import { Bullet } from '../objects/Bullet';
-import { GameScene } from '../scenes/GameScene';
+import GameScene from '../scenes/GameScene';
 import Collide from '../interface/Collide';
-import Client from '../socket/Client';
+import { Client } from '../socket/Client';
 import Player from '../socket/Player';
 import Move from '../interface/Move';
 
